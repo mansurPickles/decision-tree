@@ -30,8 +30,6 @@ for i in range(row):
 
 
 
-
-
 def entropy(x):
     size = len(x)
     pos = 0
@@ -56,19 +54,16 @@ def entropy(pos,neg):
     e = abs((math.log((pos/size),2) * (pos/size)) + (math.log((neg/size),2) * (neg/size)))
     return e
 
-def average_Information(x, s_pos, s_neg):
-    s_size = s_pos+s_neg
-    size = len(x)
-    pos = 0
-    neg = 0
-    entropoy_system = abs((math.log((s_pos/s_size),2) * (s_pos/s_size)) +
-                          (math.log((s_neg/s_size),2) * (s_neg/s_size)))
+def averageInformation(x, s_pos, s_neg):
+    s_size = s_pos + s_neg
 
-    for i in range(size):
-        if (x[i] == 0):
-            neg += 1
-        else:
-            pos += 1
+    information = (((x[0][0] + x[0][1])/s_size) * x[0][2]) + (((x[1][0] + x[1][1])/s_size) * x[1][2])
+    return information
+
+
+def buildInformationMatrix(pos1,neg1,e1, pos2,neg2,e2):
+    matrix = [[pos1,neg1,e1], [pos2,neg2,e2]]
+    return matrix
 
 
 
@@ -99,19 +94,40 @@ def getSubset(colnum, flag):
     else:
         return neg,pos
 
+def informationGain(x,y):
+    return y-x
+
 col = getColumn(0)
 
-pos, neg = getSubset(col,1)
-e = entropy(pos,neg)
+pos1, neg1 = getSubset(col,1)
+e1 = entropy(pos1,neg1)
 print('has job: yes')
-print(f'pos: {pos}')
-print(f'neg: {neg}')
-print(f'entropy: {e}')
+print(f'pos: {pos1}')
+print(f'neg: {neg1}')
+print(f'entropy: {e1}')
 
-pos, neg = getSubset(col,0)
-e = entropy(pos,neg)
+pos2, neg2 = getSubset(col,0)
+e2 = entropy(pos2,neg2)
 print('has job: no')
-print(f'pos: {pos}')
-print(f'neg: {neg}')
-print(f'entropy: {e}')
+print(f'pos: {pos2}')
+print(f'neg: {neg2}')
+print(f'entropy: {e2}')
 
+M = buildInformationMatrix(pos1,neg1,e1,pos2,neg2,e2)
+
+y = getColumn(3)
+pos_s, neg_s = getSubset(y,1)
+pos_n, neg_s = getSubset(y,0)
+es = entropy(pos_s,neg_s)
+print('system total:')
+print(f'pos: {pos_s}')
+print(f'neg: {neg_s}')
+print(f'entropy: {es}')
+
+
+informationHasJob = (averageInformation(M,pos_s, neg_s))
+print(f'information(hasjob): {informationHasJob}')
+print(informationGain(informationHasJob, es))
+
+
+#notes for me, finished checking the first column "has job" checked all values and good to go.
