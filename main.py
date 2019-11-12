@@ -97,37 +97,42 @@ def getSubset(colnum, flag):
 def informationGain(x,y):
     return y-x
 
-col = getColumn(0)
-
-pos1, neg1 = getSubset(col,1)
-e1 = entropy(pos1,neg1)
-print('has job: yes')
-print(f'pos: {pos1}')
-print(f'neg: {neg1}')
-print(f'entropy: {e1}')
-
-pos2, neg2 = getSubset(col,0)
-e2 = entropy(pos2,neg2)
-print('has job: no')
-print(f'pos: {pos2}')
-print(f'neg: {neg2}')
-print(f'entropy: {e2}')
-
-M = buildInformationMatrix(pos1,neg1,e1,pos2,neg2,e2)
-
-y = getColumn(3)
-pos_s, neg_s = getSubset(y,1)
-pos_n, neg_s = getSubset(y,0)
-es = entropy(pos_s,neg_s)
-print('system total:')
-print(f'pos: {pos_s}')
-print(f'neg: {neg_s}')
-print(f'entropy: {es}')
 
 
-informationHasJob = (averageInformation(M,pos_s, neg_s))
-print(f'information(hasjob): {informationHasJob}')
-print(informationGain(informationHasJob, es))
+def run():
+    col = getColumn(0)
+
+    pos1, neg1 = getSubset(col,1)
+    e1 = entropy(pos1,neg1)
+    print('has job: yes')
+    print(f'pos: {pos1}')
+    print(f'neg: {neg1}')
+    print(f'entropy: {e1}')
+
+    pos2, neg2 = getSubset(col,0)
+    e2 = entropy(pos2,neg2)
+    print('has job: no')
+    print(f'pos: {pos2}')
+    print(f'neg: {neg2}')
+    print(f'entropy: {e2}')
+
+    M = buildInformationMatrix(pos1,neg1,e1,pos2,neg2,e2)
+
+    y = getColumn(3)
+    pos_s, neg_s = getSubset(y,1)
+    pos_n, neg_s = getSubset(y,0)
+    es = entropy(pos_s,neg_s)
+    print('system total:')
+    print(f'pos: {pos_s}')
+    print(f'neg: {neg_s}')
+    print(f'entropy: {es}')
 
 
-#notes for me, finished checking the first column "has job" checked all values and good to go.
+    informationHasJob = (averageInformation(M,pos_s, neg_s))
+    print(f'information(hasjob): {informationHasJob}')
+    print(informationGain(informationHasJob, es))
+
+
+    #notes for me, finished checking the first column "has job" checked all values and good to go.
+
+run()
