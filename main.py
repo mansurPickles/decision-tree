@@ -30,8 +30,53 @@ for i in range(row):
 
 
 
-def entropy(x):
+def entropy(*args):
+
+    if (len(args) == 1):
+        print('in args1')
+        x = args[0]
+
+        size = len(x)
+        print(f'size {size}')
+
+        pos = 0
+        neg = 0
+
+        for i in range(size):
+            if (x[i] == 0):
+                neg += 1
+            else:
+                pos += 1
+
+        print(f'pos {pos}')
+        print(f'neg {neg}')
+        print(f'total {size}')
+
+
+        e = abs((math.log((pos/size),2) * (pos/size)) + (math.log((neg/size),2) * (neg/size)))
+        return e
+
+    elif(len(args)==2):
+        # print('in args2')
+
+        pos = args[0]
+        neg = args[1]
+
+        size = pos + neg
+        # print(f'size: {size}')
+        # print(f'pos: {pos}')
+        # print(f'neg: {neg}')
+
+        if (pos == 0 or neg == 0):
+            return 0
+
+        else:
+            e = abs((math.log((pos / size), 2) * (pos / size)) + (math.log((neg / size), 2) * (neg / size)))
+            return e
+
+def getTrueFalse(x):
     size = len(x)
+
     pos = 0
     neg = 0
 
@@ -41,18 +86,8 @@ def entropy(x):
         else:
             pos += 1
 
-    print(f'pos {pos}')
-    print(f'neg {neg}')
-    print(f'total {size}')
+    return pos,neg
 
-
-    e = abs((math.log((pos/size),2) * (pos/size)) + (math.log((neg/size),2) * (neg/size)))
-    return e
-
-def entropy(pos,neg):
-    size = pos + neg
-    e = abs((math.log((pos/size),2) * (pos/size)) + (math.log((neg/size),2) * (neg/size)))
-    return e
 
 def averageInformation(x, s_pos, s_neg):
     s_size = s_pos + s_neg
@@ -95,7 +130,7 @@ def getSubset(colnum, flag):
         return neg,pos
 
 def informationGain(x,y):
-    return y-x
+    return x-y
 
 
 
@@ -131,8 +166,73 @@ def run():
     informationHasJob = (averageInformation(M,pos_s, neg_s))
     print(f'information(hasjob): {informationHasJob}')
     print(informationGain(informationHasJob, es))
+    print('\n')
 
 
     #notes for me, finished checking the first column "has job" checked all values and good to go.
 
-run()
+def run2():
+    #get entropy of whole system
+    entropySystem = getColumn(col-1)
+    entropySystem = entropy(entropySystem)
+    print(f'entropy of system: {entropySystem}')
+
+    #now get entropy of each attribute
+    best = []
+
+    for i in range(col-1):
+        cand = getColumn(i)
+        print(f'col: {i} boolean: 1')
+        pos1,neg1 = getSubset(cand,1)
+        entropy1 = entropy(pos1,neg1)
+        print(f'pos: {pos1} \t neg: {neg1}')
+        print(f'entropy: {entropy1}')
+
+        print(f'col: {i} boolean: 0')
+        pos2,neg2 = getSubset(cand,0)
+        entropy2 = entropy(pos2,neg2)
+        print(f'pos: {pos2} \t neg: {neg2}')
+        print(f'entropy: {entropy2}')
+
+        #now calculate the average entropy
+        pos_s,neg_s = getTrueFalse(getColumn(col-1))
+        M = buildInformationMatrix(pos1,neg1,entropy1, pos2, neg2,entropy2)
+        information = averageInformation(M,pos_s,neg_s)
+        print(f'average information: {information}')
+
+        #calculate information gain
+        informationG = informationGain(entropySystem,information)
+        best.append(informationG)
+        print(f'information gain: {informationG}')
+        print('\n')
+
+    pickNode = -1
+    nodeIndex = -1
+
+    for i in range(len(best)):
+        if (best[i] > pickNode):
+            pickNode = best[i]
+            nodeIndex = i
+    print(f'best node, column: {nodeIndex}')
+
+    cand = getColumn(nodeIndex)
+
+    print(f'col: {nodeIndex} boolean: 1')
+    pos1, neg1 = getSubset(cand, 1)
+    entropy1 = entropy(pos1, neg1)
+    print(f'pos: {pos1} \t neg: {neg1}')
+    print(f'entropy: {entropy1}')
+
+    print(f'col: {nodeIndex} boolean: 0')
+    pos2, neg2 = getSubset(cand, 0)
+    entropy2 = entropy(pos2, neg2)
+    print(f'pos: {pos2} \t neg: {neg2}')
+    print(f'entropy: {entropy2}')
+
+
+    print('*****' * 10)
+    print('stop')
+
+
+
+run2()
