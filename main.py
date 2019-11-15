@@ -27,6 +27,8 @@ for i in range(row):
         str += ' '
     print(str)
 
+print('*******'*10)
+
 
 def entropy(*args):
 
@@ -111,25 +113,25 @@ def getSubset(*args):
                 subsetReturn.append(0)
         return subsetReturn
 
-    elif (len(args) == 4):
-        colnum1 = args[0]
-        colnum2 = args[1]
-        flag1 = args[2]
-        flag2 = args[3]
-
-        subsetReturn = []
-
-        size = len(colnum1)
-
-        y = getColumn(3)
-
-        for i in range(size):
-            if (colnum1[i] == flag1)  and (colnum2[i] == flag2) and (y[i] == flag2):
-                subsetReturn.append(1)
-            elif (colnum1[i] == flag1) and (colnum2[i] == flag1) and (y[i] != flag1):
-                subsetReturn.append(0)
-
-        return subsetReturn
+    # elif (len(args) == 4):
+    #     colnum1 = args[0]
+    #     colnum2 = args[1]
+    #     flag1 = args[2]
+    #     flag2 = args[3]
+    #
+    #     subsetReturn = []
+    #
+    #     size = len(colnum1)
+    #
+    #     y = getColumn(3)
+    #
+    #     for i in range(size):
+    #         if (colnum1[i] == flag1)  and (colnum2[i] == flag2) and (y[i] == flag2):
+    #             subsetReturn.append(1)
+    #         elif (colnum1[i] == flag1) and (colnum2[i] == flag1) and (y[i] != flag1):
+    #             subsetReturn.append(0)
+    #
+    #     return subsetReturn
 
 
 
@@ -171,7 +173,9 @@ def run2():
 
     entropySystem = getColumn(col-1)
     entropySystem = entropy(entropySystem)
+    print()
     print(f'entropy of system: {entropySystem}')
+    print()
 
     #now get entropy of each attribute
 
@@ -192,6 +196,7 @@ def run2():
 
     print(f'best node, column: {nodeIndex}')
     #set
+    totalColNum = col - 1
     tree[0] = nodeIndex
     cand = getColumn(nodeIndex)
     entropy1 = -1
@@ -224,8 +229,10 @@ def run2():
         if (entropy2 == 0):
             tree[i*2] = 'no'
 
-        elif (entropy1 != 0):
-            getSubset()
+        # elif (entropy1 != 0):
+        #     for i in range (totalColNum):
+        #         for j in range(2):
+        #             pass
 
     print('*****' * 10)
     print('stop')

@@ -1,0 +1,18 @@
+import math
+import pandas as pd
+
+def reader():
+    df = pd.read_csv('data.csv', names = {'job', 'insurance', 'votes', 'action'})
+    return df
+
+def createSubset(df, col1, mark1, col2, mark2):
+    col1 = df.loc[ (df[col1] == mark1) & (df[col2] == mark2)]
+
+    return col1
+
+df = reader()
+# col1 = df.loc[df['job'] == 1]
+# print(col1)
+# print(len(col1))
+x = createSubset(df,'job', 0, 'action', 1)
+print(x)
