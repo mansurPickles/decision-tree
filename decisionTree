@@ -45,9 +45,19 @@ def createNode(df, control, flag, attributes):
     print('************'*10)
     for i in range(len(attributes)):
         for k in labels[i]:
-            num = i + k
+            num = i*(len(labels[i])) + k
             subsetToPass.append(subset[num])
+
+
+
+        size = len (subsetToPass)
+
+        for m in range(size - 1):
+            for n in range(m, size):
+                print('x')
+
         print(subsetToPass)
+        subsetToPass.clear()
         print('***'*5)
 
 
@@ -110,9 +120,9 @@ col = df['action']
 label = getLables(col)
 print(label)
 
-attributes = ['job', 'insurance', 'votes']
+attributes = ['insurance', 'votes']
 
-createNode(df,'action', 1, attributes)
+createNode(df,'job', 1, attributes)
 
 # play()
 
