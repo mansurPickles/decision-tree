@@ -2,17 +2,128 @@ import math
 import pandas as pd
 
 def reader():
-    df = pd.read_csv('data.csv', names = {'job', 'insurance', 'votes', 'action'})
+    df = pd.read_csv("data1.csv", skiprows=1, names=['job', 'insurance', 'votes', 'action'])
     return df
 
 def createSubset(df, col1, mark1, col2, mark2):
-    col1 = df.loc[ (df[col1] == mark1) & (df[col2] == mark2)]
+    col3 = df.loc[(df[col1] == mark1) & (df[col2] == mark2)]
+    return col3
 
-    return col1
+def getLables(col):
+    labels = []
+
+    for label in col:
+        unique = True
+        for i in range(len(labels)):
+            if (label == labels[i]):
+                unique = False
+        if(unique == True):
+            labels.append(label)
+
+    return labels
+
+def createNode(df, control, flag, attributes):
+    row_size = df.shape[0]
+    col_size = df.shape[1]
+
+    # flag = getLables(df[control])
+    #get labels
+    labels = []
+    subset = []
+
+    for i in range(len(attributes)):
+        row = getLables(df[attributes[i]])
+        labels.append(row)
+
+    for i in range(len(attributes)):
+        for k in labels[i]:
+            sub = createSubset(df,control,flag,attributes[i],k)
+            subset.append(sub)
+
+    subsetToPass = []
+
+    print('************'*10)
+    for i in range(len(attributes)):
+        for k in labels[i]:
+            num = i + k
+            subsetToPass.append(subset[num])
+        print(subsetToPass)
+        print('***'*5)
+
+
+def entropy(subset, attribute ):
+    pass
+
+def play():
+    darray = [[]]
+
+
+    darray[0].append([0,10,20])
+
+    darray.append([0,12,24])
+
+    print(darray)
+    print(len(darray))
+
+def run():
+
+    row_size = df.shape[0]
+    col_size = df.shape[1]
+    attributes = ['job', 'insurance', 'votes']
+
+    print(row_size)
+    print(col_size)
+
+
+    for i in attributes:
+        pos1 = 0
+        pos2 = 0
+        neg1 = 0
+        neg2 = 0
+
+        print(f' attribute: {i}: boolean: pos')
+        col1 = (createSubset(df,i, 1, 'action', 1))
+        print(col1)
+        print(f' attribute: {i}: boolean: neg')
+        col2 = (createSubset(df,i, 1, 'action', 0))
+        print(col2)
+        pos1 += len(col1)
+        neg1 += len(col2)
+        print(f'positive: {pos1}')
+        print(f'negatiev: {neg1}')
+
+
+        print(f' attribute: !{i}: boolean: 0_pos')
+        col3 = (createSubset(df,i, 0, 'action', 1))
+        print(col3)
+        print(f' attribute: !{i}: boolean: 0_neg')
+        col4 = (createSubset(df,i, 0, 'action', 0))
+        print(col4)
+        pos2 += len(col3)
+        neg2 += len(col4)
+        print(f'positive: {pos2}')
+        print(f'negatiev: {neg2}')
+
 
 df = reader()
+col = df['action']
+label = getLables(col)
+print(label)
+
+attributes = ['job', 'insurance', 'votes']
+
+createNode(df,'action', 1, attributes)
+
+# play()
+
+
+
+# run()
+# print(createSubset(df, 'job', 1, 'action', 1))
+
 # col1 = df.loc[df['job'] == 1]
 # print(col1)
 # print(len(col1))
-x = createSubset(df,'job', 0, 'action', 1)
-print(x)
+# x = createSubset(df,'job', 0, 'action', 1)
+# print(x)
+# run()
