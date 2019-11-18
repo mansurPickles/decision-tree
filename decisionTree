@@ -22,47 +22,149 @@ def getLables(col):
 
     return labels
 
-def createNode(df, control, flag, attributes):
+def getLabelCount(sub, flag):
+    pass
+
+def createNode(df, control, attributes):
     row_size = df.shape[0]
     col_size = df.shape[1]
 
-    # flag = getLables(df[control])
+    flag = getLables(df[control])
     #get labels
     labels = []
     subset = []
+    subsetToPass = []
+    labelCount = []
 
     for i in range(len(attributes)):
         row = getLables(df[attributes[i]])
         labels.append(row)
 
-    for i in range(len(attributes)):
-        for k in labels[i]:
-            sub = createSubset(df,control,flag,attributes[i],k)
-            subset.append(sub)
+    for j in flag:
+        for i in range(len(attributes)):
+        # for j in flag:
+            for k in labels[i]:
+                print(f'control: {control} | boolean: {j}, | attribute: {attributes[i]} | boolean: {k}')
+                sub = createSubset(df,control,j,attributes[i],k)
+                labelCount.append(len(sub))
+                # print(sub)
+                # print(f'count of label: {len(sub)}')
+                subset.append(sub)
+            temp = list(subset)
+            subsetToPass.append(temp)
 
-    subsetToPass = []
+            # print('************' * 10)
+            # print(subsetToPass)
+            subset.clear()
+            # subsetToPass.clear()
 
-    print('************'*10)
-    for i in range(len(attributes)):
-        for k in labels[i]:
-            num = i*(len(labels[i])) + k
-            subsetToPass.append(subset[num])
+    # print(subsetToPass)
 
-
-
-        size = len (subsetToPass)
-
-        for m in range(size - 1):
-            for n in range(m, size):
-                print('x')
-
-        print(subsetToPass)
-        subsetToPass.clear()
-        print('***'*5)
+    # print(f'label count:')
+    # print(labelCount)
+    return subsetToPass, labelCount
 
 
-def entropy(subset, attribute ):
-    pass
+def entropy(labelCount):
+
+    labelCountSize = len(labelCount)
+    size = 0
+    e = 0
+
+    returnLabelCount = []
+    print(f'in entropy: {labelCount}')
+
+    for i in range(labelCountSize):
+        size += labelCount[i]
+        returnLabelCount.append(labelCount[i])
+    print(f'size: {size}')
+
+    for i in range(labelCountSize):
+
+        if (labelCount[i]!=0):
+            e += math.log(labelCount[i]/size,2) * labelCount[i]/size
+        else:
+            print('shouldnt be here')
+            e = 0
+
+    e = abs(e)
+    return e, returnLabelCount
+
+def findRoot(df, attribute):
+    goal = [attribute[-1]]
+    attribute = attribute[0:-1]
+    col = df[attribute[-1]]
+    labels = getLables(col)
+    entropySet = []
+    potentialNodes = [] #what actually matters
+
+    #find entropy of system
+    val = col.value_counts()
+
+    system = []
+    system_size = 0
+    for i in range(len(val)):
+        system.append(val[i])
+        system_size += val[i]
+    es,trash = entropy(system)
+    print(f'entropy of system {es}')
+    print(f'system size: {system_size}')
+
+    sizeCount = []
+
+
+    for i in range(len(attribute)):
+        start = 0
+        cand, labelCount = createNode(df, attribute[i], goal)
+        print('retruend')
+        mark = len(labels)
+        print(labelCount)
+        index = 0
+        while(start!=len(labelCount)):
+            temp = labelCount[start: (start+mark)]
+            e,tempSize = entropy(temp)
+            entropySet.append(e)
+            start += mark
+            sizeCount.append(tempSize)
+            print(f'entropy {e}')
+        print('size count')
+        print(sizeCount)
+
+        #lets get averages
+        temp2 = averageInformation(sizeCount,entropySet,system_size)
+        informationGain = es - temp2
+        potentialNodes.append(informationGain)
+        entropySet.clear()
+        sizeCount.clear()
+
+    #get max
+    a = max(potentialNodes)
+
+    counter = 0
+    for i in potentialNodes:
+        if (i != a):
+            counter += 1
+
+    #thats the best node
+    print(counter)
+
+
+
+def averageInformation(labelCount, entropySet, systemSize):
+        labelCountSize = len(entropySet)
+        runningTally = 0
+        for i in range(len(labelCount)):
+            temp = 0
+            for j in range(labelCountSize):
+                a = labelCount[i][j]
+                temp += a
+            temp = temp/systemSize
+            runningTally += temp * entropySet[i]
+
+        print(f'average: {runningTally}')
+        return runningTally
+
+
 
 def play():
     darray = [[]]
@@ -116,24 +218,5 @@ def run():
 
 
 df = reader()
-col = df['action']
-label = getLables(col)
-print(label)
-
-attributes = ['insurance', 'votes']
-
-createNode(df,'job', 1, attributes)
-
-# play()
-
-
-
-# run()
-# print(createSubset(df, 'job', 1, 'action', 1))
-
-# col1 = df.loc[df['job'] == 1]
-# print(col1)
-# print(len(col1))
-# x = createSubset(df,'job', 0, 'action', 1)
-# print(x)
-# run()
+attributes = ['job', 'insurance', 'votes', 'action']
+findRoot(df, attributes)
