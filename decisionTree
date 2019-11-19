@@ -22,8 +22,6 @@ def getLables(col):
 
     return labels
 
-def getLabelCount(sub, flag):
-    pass
 
 def createNode(df, control, attributes):
     row_size = df.shape[0]
@@ -47,21 +45,11 @@ def createNode(df, control, attributes):
                 print(f'control: {control} | boolean: {j}, | attribute: {attributes[i]} | boolean: {k}')
                 sub = createSubset(df,control,j,attributes[i],k)
                 labelCount.append(len(sub))
-                # print(sub)
-                # print(f'count of label: {len(sub)}')
                 subset.append(sub)
             temp = list(subset)
             subsetToPass.append(temp)
 
-            # print('************' * 10)
-            # print(subsetToPass)
             subset.clear()
-            # subsetToPass.clear()
-
-    # print(subsetToPass)
-
-    # print(f'label count:')
-    # print(labelCount)
     return subsetToPass, labelCount
 
 
@@ -84,13 +72,27 @@ def entropy(labelCount):
         if (labelCount[i]!=0):
             e += math.log(labelCount[i]/size,2) * labelCount[i]/size
         else:
-            print('shouldnt be here')
             e = 0
 
     e = abs(e)
     return e, returnLabelCount
 
+def printTree(tree):
+    str = ' '*3
+    str+= tree[0].__str__()
+    print(str)
+    str = tree[1].__str__()
+    str += ' '*5
+    str += tree[2].__str__()
+    print(str)
+
 def findRoot(df, attribute):
+
+
+    tree = [-1]*10
+
+    copyAttribute = attribute.copy()
+
     goal = [attribute[-1]]
     attribute = attribute[0:-1]
     col = df[attribute[-1]]
@@ -146,75 +148,82 @@ def findRoot(df, attribute):
             counter += 1
 
     #thats the best node
-    print(counter)
+    # print(counter)
+    tree[0] = counter
+
+    nodeLabel = attribute[counter]
+    subset = df[nodeLabel]
+    nodeLabels = subset.value_counts()
+
+    subsetAttribute = attribute.remove(nodeLabel)
+    # print('node labels')
+    # print(nodeLabels)
+
+    #recursive part
+    for i in range(len(nodeLabels)):
+        temp_subset = df.loc[df[nodeLabel] == i]
+        # print(temp_subset)
+        systemSize = createSubset(temp_subset,copyAttribute[counter], i, copyAttribute[-1], i)
+        # print(systemSize)
+        systemSize = (len(systemSize))
+
+        # print(f'system size: {systemSize}')
+        leaf = recursiveHelper(df, temp_subset, subsetAttribute, goal, systemSize, nodeLabels.index[i],  tree, i+1)
+        print(leaf)
 
 
+
+    printTree(tree)
+
+def recursiveHelper(df, subset, attribute, goal, systemSize, leafValue,  tree, index):
+
+    nodeLabels = leafValue
+
+    if systemSize == 0:
+        # return f' leaf {leafValue}'
+        tree[index] = leafValue
+        return {leafValue}
+
+    else:
+        labels = []
+        control = 'action'
+        labelCount = []
+        subsetToPass = []
+
+        for i in range(len(attributes)):
+            row = getLables(df[attributes[i]])
+            labels.append(row)
+
+        for i in range(len(attributes)):
+            # for j in flag:
+            for k in labels[i]:
+                print(f'control: {control} | boolean: {leafValue}, | attribute: {attributes[i]} | boolean: {k}')
+                sub = createSubset(df, control, leafValue, attributes[i], k)
+                if(len(sub) == 0):
+                    return leafValue
+
+                else:
+                    labelCount.append(len(sub))
+                    subset.append(sub)
+                    temp = list(subset)
+            subsetToPass.append(temp)
+
+    return findRoot(subsetToPass,attribute)
 
 def averageInformation(labelCount, entropySet, systemSize):
-        labelCountSize = len(entropySet)
-        runningTally = 0
-        for i in range(len(labelCount)):
-            temp = 0
-            for j in range(labelCountSize):
-                a = labelCount[i][j]
-                temp += a
-            temp = temp/systemSize
-            runningTally += temp * entropySet[i]
+    labelCountSize = len(entropySet)
+    runningTally = 0
+    for i in range(len(labelCount)):
+        temp = 0
+        for j in range(labelCountSize):
+            a = labelCount[i][j]
+            temp += a
+        temp = temp/systemSize
+        runningTally += temp * entropySet[i]
 
-        print(f'average: {runningTally}')
-        return runningTally
+    print(f'average: {runningTally}')
+    return runningTally
 
-
-
-def play():
-    darray = [[]]
-
-
-    darray[0].append([0,10,20])
-
-    darray.append([0,12,24])
-
-    print(darray)
-    print(len(darray))
-
-def run():
-
-    row_size = df.shape[0]
-    col_size = df.shape[1]
-    attributes = ['job', 'insurance', 'votes']
-
-    print(row_size)
-    print(col_size)
-
-
-    for i in attributes:
-        pos1 = 0
-        pos2 = 0
-        neg1 = 0
-        neg2 = 0
-
-        print(f' attribute: {i}: boolean: pos')
-        col1 = (createSubset(df,i, 1, 'action', 1))
-        print(col1)
-        print(f' attribute: {i}: boolean: neg')
-        col2 = (createSubset(df,i, 1, 'action', 0))
-        print(col2)
-        pos1 += len(col1)
-        neg1 += len(col2)
-        print(f'positive: {pos1}')
-        print(f'negatiev: {neg1}')
-
-
-        print(f' attribute: !{i}: boolean: 0_pos')
-        col3 = (createSubset(df,i, 0, 'action', 1))
-        print(col3)
-        print(f' attribute: !{i}: boolean: 0_neg')
-        col4 = (createSubset(df,i, 0, 'action', 0))
-        print(col4)
-        pos2 += len(col3)
-        neg2 += len(col4)
-        print(f'positive: {pos2}')
-        print(f'negatiev: {neg2}')
 
 
 df = reader()
